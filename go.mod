@@ -58,12 +58,12 @@ require (
 	github.com/tdewolff/minify/v2 v2.9.22
 	github.com/yuin/goldmark v1.4.4
 	github.com/yuin/goldmark-highlighting v0.0.0-20200307114337-60d527fdb691
-	gocloud.dev v0.20.0
+	gocloud.dev v0.24.0
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.7
-	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/tools v0.1.9
 	google.golang.org/api v0.63.0
 	gopkg.in/yaml.v2 v2.4.0
 )
