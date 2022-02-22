@@ -302,25 +302,8 @@ func createBuildPlugins(c *Client, opts Options) ([]api.Plugin, error) {
 
 func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 	var target api.Target
-	switch opts.Target {
-	case "", "esnext":
-		target = api.ESNext
-	case "es5":
-		target = api.ES5
-	case "es6", "es2015":
-		target = api.ES2015
-	case "es2016":
-		target = api.ES2016
-	case "es2017":
-		target = api.ES2017
-	case "es2018":
-		target = api.ES2018
-	case "es2019":
-		target = api.ES2019
-	case "es2020":
-		target = api.ES2020
-	default:
-		err = fmt.Errorf("invalid target: %q", opts.Target)
+	target, err = toBuildTarget(opts)
+	if err != nil {
 		return
 	}
 
@@ -330,33 +313,15 @@ func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 	}
 
 	var loader api.Loader
-	switch mediaType.SubType {
-	// TODO(bep) ESBuild support a set of other loaders, but I currently fail
-	// to see the relevance. That may change as we start using this.
-	case media.JavascriptType.SubType:
-		loader = api.LoaderJS
-	case media.TypeScriptType.SubType:
-		loader = api.LoaderTS
-	case media.TSXType.SubType:
-		loader = api.LoaderTSX
-	case media.JSXType.SubType:
-		loader = api.LoaderJSX
-	default:
-		err = fmt.Errorf("unsupported Media Type: %q", opts.mediaType)
+	loader, err = toBuildLoader(opts)
+	if err != nil {
 		return
 	}
 
 	var format api.Format
 	// One of: iife, cjs, esm
-	switch opts.Format {
-	case "", "iife":
-		format = api.FormatIIFE
-	case "esm":
-		format = api.FormatESModule
-	case "cjs":
-		format = api.FormatCommonJS
-	default:
-		err = fmt.Errorf("unsupported script output format: %q", opts.Format)
+	format, err = toBuildFormat(opts)
+	if err != nil {
 		return
 	}
 
@@ -369,15 +334,8 @@ func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 	outDir := opts.outDir
 	outFile := ""
 	var sourceMap api.SourceMap
-	switch opts.SourceMap {
-	case "inline":
-		sourceMap = api.SourceMapInline
-	case "external":
-		sourceMap = api.SourceMapExternal
-	case "":
-		sourceMap = api.SourceMapNone
-	default:
-		err = fmt.Errorf("unsupported sourcemap type: %q", opts.SourceMap)
+	sourceMap, err = toBuildSourceMap(opts)
+	if err != nil {
 		return
 	}
 
@@ -411,6 +369,80 @@ func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 			ResolveDir: opts.resolveDir,
 			Loader:     loader,
 		},
+	}
+	return
+}
+
+func toBuildTarget(opts Options) (target api.Target, err error) {
+	switch opts.Target {
+	case "", "esnext":
+		target = api.ESNext
+	case "es5":
+		target = api.ES5
+	case "es6", "es2015":
+		target = api.ES2015
+	case "es2016":
+		target = api.ES2016
+	case "es2017":
+		target = api.ES2017
+	case "es2018":
+		target = api.ES2018
+	case "es2019":
+		target = api.ES2019
+	case "es2020":
+		target = api.ES2020
+	default:
+		err = fmt.Errorf("invalid target: %q", opts.Target)
+		return
+	}
+	return
+}
+
+func toBuildLoader(opts Options) (loader api.Loader, err error) {
+	switch opts.mediaType.SubType {
+	// TODO(bep) ESBuild support a set of other loaders, but I currently fail
+	// to see the relevance. That may change as we start using this.
+	case media.JavascriptType.SubType:
+		loader = api.LoaderJS
+	case media.TypeScriptType.SubType:
+		loader = api.LoaderTS
+	case media.TSXType.SubType:
+		loader = api.LoaderTSX
+	case media.JSXType.SubType:
+		loader = api.LoaderJSX
+	default:
+		err = fmt.Errorf("unsupported Media Type: %q", opts.mediaType)
+		return
+	}
+	return
+}
+
+func toBuildFormat(opts Options) (format api.Format, err error) {
+	switch opts.Format {
+	case "", "iife":
+		format = api.FormatIIFE
+	case "esm":
+		format = api.FormatESModule
+	case "cjs":
+		format = api.FormatCommonJS
+	default:
+		err = fmt.Errorf("unsupported script output format: %q", opts.Format)
+		return
+	}
+	return
+}
+
+func toBuildSourceMap(opts Options) (sourceMap api.SourceMap, err error) {
+	switch opts.SourceMap {
+	case "inline":
+		sourceMap = api.SourceMapInline
+	case "external":
+		sourceMap = api.SourceMapExternal
+	case "":
+		sourceMap = api.SourceMapNone
+	default:
+		err = fmt.Errorf("unsupported sourcemap type: %q", opts.SourceMap)
+		return
 	}
 	return
 }
