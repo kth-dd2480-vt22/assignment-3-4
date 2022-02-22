@@ -59,8 +59,11 @@ func (*Namespace) Default(dflt interface{}, given ...interface{}) (interface{}, 
 	}
 
 	set := false
-	set = DefaultHelper(given)
-
+	flag := false
+	set, flag = firstHelper(given[0])
+	if !flag {
+		set = secondHelper(g)
+	}
 	if set {
 		return given[0], nil
 	}
@@ -68,10 +71,33 @@ func (*Namespace) Default(dflt interface{}, given ...interface{}) (interface{}, 
 	return dflt, nil
 }
 
-func DefaultHelper(given []interface{}) bool {
+func firstHelper(given interface{}) (bool, bool) {
 
 	set := false
-	g := reflect.ValueOf(given[0])
+	flag := false
+	g := reflect.ValueOf(given)
+
+	switch g.Kind() {
+	case reflect.Float32, reflect.Float64:
+		set = g.Float() != 0
+		flag = true
+	case reflect.Complex64, reflect.Complex128:
+		set = g.Complex() != 0
+		flag = true
+	case reflect.Struct:
+		switch actual := given.(type) {
+		case time.Time:
+			set = !actual.IsZero()
+		default:
+			set = true
+		}
+		flag = true
+	}
+	return set, flag
+}
+
+func secondHelper(g reflect.Value) bool {
+	set := false
 
 	switch g.Kind() {
 	case reflect.Bool:
@@ -82,17 +108,6 @@ func DefaultHelper(given []interface{}) bool {
 		set = g.Int() != 0
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		set = g.Uint() != 0
-	case reflect.Float32, reflect.Float64:
-		set = g.Float() != 0
-	case reflect.Complex64, reflect.Complex128:
-		set = g.Complex() != 0
-	case reflect.Struct:
-		switch actual := given[0].(type) {
-		case time.Time:
-			set = !actual.IsZero()
-		default:
-			set = true
-		}
 	default:
 		set = !g.IsNil()
 	}
