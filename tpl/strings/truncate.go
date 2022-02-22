@@ -82,76 +82,95 @@ func (ns *Namespace) Truncate(a interface{}, options ...interface{}) (template.H
 		}
 		return template.HTML(html.EscapeString(text)), nil
 	}
+	if isHTML {
+		return HTMLHandler(text, ellipsis, length)
+	} else {
+		var lastWordIndex, lastNonSpace, currentLen, endTextPos int
+		for i, r := range text {
+			currentLen++
+			lastWordIndex, lastNonSpace = SpecialRuneHandler(r, i, lastWordIndex, lastNonSpace)
+			if currentLen > length {
+				// * 13 (+1)
+				if lastWordIndex == 0 {
+					endTextPos = i
+				} else {
+					endTextPos = lastWordIndex
+				}
+				out := text[0:endTextPos]
+				return template.HTML(html.EscapeString(out) + ellipsis), nil
+			}
+		}
+	}
+	return template.HTML(html.EscapeString(text)), nil
+}
 
+func HTMLHandler(text string, ellipsis string, length int) (template.HTML, error) {
+	// This part can be separate function
 	tags := []htmlTag{}
 	var lastWordIndex, lastNonSpace, currentLen, endTextPos, nextTag int
-
 	for i, r := range text {
 		if i < nextTag {
 			continue
 		}
-
-		if isHTML {
-			// Make sure we keep tag of HTML tags
-			slice := text[i:]
-			m := tagRE.FindStringSubmatchIndex(slice)
-			if len(m) > 0 && m[0] == 0 {
-				nextTag = i + m[1]
-				tagname := slice[m[4]:m[5]]
-				lastWordIndex = lastNonSpace
-				_, singlet := htmlSinglets[tagname]
-				if !singlet && m[6] == -1 {
-					tags = append(tags, htmlTag{name: tagname, pos: i, openTag: m[2] == -1})
-				}
-
-				continue
+		// Make sure we keep tag of HTML tags
+		slice := text[i:]
+		m := tagRE.FindStringSubmatchIndex(slice)
+		if len(m) > 0 && m[0] == 0 {
+			nextTag = i + m[1]
+			tagname := slice[m[4]:m[5]]
+			lastWordIndex = lastNonSpace
+			_, singlet := htmlSinglets[tagname]
+			if !singlet && m[6] == -1 {
+				tags = append(tags, htmlTag{name: tagname, pos: i, openTag: m[2] == -1})
 			}
+
+			continue
 		}
 
 		currentLen++
-		if unicode.IsSpace(r) {
-			lastWordIndex = lastNonSpace
-		} else if unicode.In(r, unicode.Han, unicode.Hangul, unicode.Hiragana, unicode.Katakana) {
-			lastWordIndex = i
-		} else {
-			lastNonSpace = i + utf8.RuneLen(r)
-		}
+		lastWordIndex, lastNonSpace = SpecialRuneHandler(r, i, lastWordIndex, lastNonSpace)
 
 		if currentLen > length {
-			if lastWordIndex == 0 {
-				endTextPos = i
-			} else {
-				endTextPos = lastWordIndex
-			}
-			out := text[0:endTextPos]
-			if isHTML {
-				out += ellipsis
-				// Close out any open HTML tags
-				var currentTag *htmlTag
-				for i := len(tags) - 1; i >= 0; i-- {
-					tag := tags[i]
-					if tag.pos >= endTextPos || currentTag != nil {
-						if currentTag != nil && currentTag.name == tag.name {
-							currentTag = nil
-						}
-						continue
-					}
-
-					if tag.openTag {
-						out += ("</" + tag.name + ">")
-					} else {
-						currentTag = &tag
-					}
-				}
-
-				return template.HTML(out), nil
-			}
-			return template.HTML(html.EscapeString(out) + ellipsis), nil
+			return TruncUtil(i, lastWordIndex, endTextPos, text, ellipsis, tags)
 		}
 	}
+	return template.HTML(text), nil
+}
 
-	if isHTML {
-		return template.HTML(text), nil
+func TruncUtil(i int, lastWordIndex int, endTextPos int, text string, ellipsis string, tags []htmlTag) (template.HTML, error) {
+	if lastWordIndex == 0 {
+		endTextPos = i
+	} else {
+		endTextPos = lastWordIndex
 	}
-	return template.HTML(html.EscapeString(text)), nil
+	out := text[0:endTextPos]
+	out += ellipsis
+	// Close out any open HTML tags
+	var currentTag *htmlTag
+	for j := len(tags) - 1; j >= 0; j-- {
+		tag := tags[j]
+		if tag.pos >= endTextPos || currentTag != nil {
+			if currentTag != nil && currentTag.name == tag.name {
+				currentTag = nil
+			}
+			continue
+		}
+		if tag.openTag {
+			out += ("</" + tag.name + ">")
+		} else {
+			currentTag = &tag
+		}
+	}
+	return template.HTML(out), nil
+}
+
+func SpecialRuneHandler(r rune, i int, lastWordIndex int, lastNonSpace int) (int, int) {
+	if unicode.IsSpace(r) {
+		lastWordIndex = lastNonSpace
+	} else if unicode.In(r, unicode.Han, unicode.Hangul, unicode.Hiragana, unicode.Katakana) {
+		lastWordIndex = i
+	} else {
+		lastNonSpace = i + utf8.RuneLen(r)
+	}
+	return lastWordIndex, lastNonSpace
 }
