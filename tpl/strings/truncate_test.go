@@ -14,6 +14,7 @@
 package strings
 
 import (
+	"github.com/junhwi/gobco"
 	"html/template"
 	"reflect"
 	"strings"
@@ -22,7 +23,8 @@ import (
 
 func TestTruncate(t *testing.T) {
 	t.Parallel()
-
+	gobco.ReportCoverage()
+	gobco.ReportProfile("c.out")
 	var err error
 	cases := []struct {
 		v1    interface{}
@@ -49,6 +51,20 @@ func TestTruncate(t *testing.T) {
 		{4, template.HTML("<p>a<b><i>b</b>c d e</p>"), nil, template.HTML("<p>a<b><i>b</b>c …</p>"), false},
 		{10, nil, nil, template.HTML(""), true},
 		{nil, nil, nil, template.HTML(""), true},
+		// -- Improving branch coverage --
+		//
+		// Cant cast string "abc" to int which will trigger err to be non-nil on line 46
+		{"abc", nil, nil, template.HTML(""), true},
+		// Cant cast complex 1 + 1i to string which will trigger err to be non-nil on line 62
+		{10, complex(1, 1), "", template.HTML(""), true},
+		// Trying to truncate something that cant be cast to string will trigger err on line 81
+		{10, "", complex(1, 1), template.HTML(""), true},
+		// Input length is larger than utf8.RuneCountInString which triggers if statement on line 87
+		{50, "", "I am a test sentence", template.HTML("I am a test sentence"), false},
+		// Input text is HTML (and input length is larger than utf8.RuneCountInString) which triggers if statement on line 89
+		{50, "", template.HTML("I am a test sentence"), template.HTML("I am a test sentence"), false},
+		// Passes through all previous cases to line 174 where it evalutates to true (previously not reached)
+		{3, "", template.HTML("123<p>"), template.HTML("123<p>"), false},
 	}
 	for i, c := range cases {
 		var result template.HTML

@@ -32,6 +32,7 @@ require (
 	github.com/google/go-cmp v0.5.6
 	github.com/gorilla/websocket v1.4.2
 	github.com/jdkato/prose v1.2.1
+	github.com/junhwi/gobco v0.0.0-20200104144416-c015e3f3de35 // indirect
 	github.com/kylelemons/godebug v1.1.0
 	github.com/kyokomi/emoji/v2 v2.2.8
 	github.com/magefile/mage v1.11.0
