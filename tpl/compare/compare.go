@@ -40,20 +40,23 @@ type Namespace struct {
 // is not.  "Set" in this context means non-zero for numeric types and times;
 // non-zero length for strings, arrays, slices, and maps;
 // any boolean or struct value; or non-nil for any other types.
-func (*Namespace) Default(dflt interface{}, given ...interface{}) (interface{}, error) {
+func (*Namespace) Default(dflt interface{}, coverage *[100]int, given ...interface{}) (interface{}, error) {
 	// given is variadic because the following construct will not pass a piped
 	// argument when the key is missing:  {{ index . "key" | default "foo" }}
 	// The Go template will complain that we got 1 argument when we expected 2.
 
 	if len(given) == 0 {
+		coverage[0]++
 		return dflt, nil
 	}
 	if len(given) != 1 {
+		coverage[1]++
 		return nil, fmt.Errorf("wrong number of args for default: want 2 got %d", len(given)+1)
 	}
 
 	g := reflect.ValueOf(given[0])
 	if !g.IsValid() {
+		coverage[2]++
 		return dflt, nil
 	}
 
@@ -62,28 +65,39 @@ func (*Namespace) Default(dflt interface{}, given ...interface{}) (interface{}, 
 	switch g.Kind() {
 	case reflect.Bool:
 		set = true
+		coverage[3]++
 	case reflect.String, reflect.Array, reflect.Slice, reflect.Map:
 		set = g.Len() != 0
+		coverage[4]++
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		set = g.Int() != 0
+		coverage[5]++
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		set = g.Uint() != 0
+		coverage[6]++
 	case reflect.Float32, reflect.Float64:
 		set = g.Float() != 0
+		coverage[7]++
 	case reflect.Complex64, reflect.Complex128:
 		set = g.Complex() != 0
+		coverage[8]++
 	case reflect.Struct:
+		coverage[9]++
 		switch actual := given[0].(type) {
 		case time.Time:
 			set = !actual.IsZero()
+			coverage[10]++
 		default:
 			set = true
+			coverage[11]++
 		}
 	default:
 		set = !g.IsNil()
+		coverage[12]++
 	}
 
 	if set {
+		coverage[13]++
 		return given[0], nil
 	}
 
