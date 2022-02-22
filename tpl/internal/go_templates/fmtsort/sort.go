@@ -84,102 +84,131 @@ func compare(aVal, bVal reflect.Value) int {
 	switch aVal.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		a, b := aVal.Int(), bVal.Int()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return intCompare(a, b)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		a, b := aVal.Uint(), bVal.Uint()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return uintCompare(a, b)
 	case reflect.String:
 		a, b := aVal.String(), bVal.String()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return stringCompare(a, b)
 	case reflect.Float32, reflect.Float64:
 		return floatCompare(aVal.Float(), bVal.Float())
 	case reflect.Complex64, reflect.Complex128:
 		a, b := aVal.Complex(), bVal.Complex()
-		if c := floatCompare(real(a), real(b)); c != 0 {
-			return c
-		}
-		return floatCompare(imag(a), imag(b))
+		return complexCompare(a, b)
 	case reflect.Bool:
 		a, b := aVal.Bool(), bVal.Bool()
-		switch {
-		case a == b:
-			return 0
-		case a:
-			return 1
-		default:
-			return -1
-		}
+		return boolCompare(a, b)
 	case reflect.Ptr, reflect.UnsafePointer:
 		a, b := aVal.Pointer(), bVal.Pointer()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return pointerCompare(a, b)
 	case reflect.Chan:
 		if c, ok := nilCompare(aVal, bVal); ok {
 			return c
 		}
 		ap, bp := aVal.Pointer(), bVal.Pointer()
-		switch {
-		case ap < bp:
-			return -1
-		case ap > bp:
-			return 1
-		default:
-			return 0
-		}
+		return pointerCompare(ap, bp)
 	case reflect.Struct:
-		for i := 0; i < aVal.NumField(); i++ {
-			if c := compare(aVal.Field(i), bVal.Field(i)); c != 0 {
-				return c
-			}
-		}
-		return 0
+		return structCompare(aVal, bVal)
 	case reflect.Array:
-		for i := 0; i < aVal.Len(); i++ {
-			if c := compare(aVal.Index(i), bVal.Index(i)); c != 0 {
-				return c
-			}
-		}
-		return 0
+		return arrayCompare(aVal, bVal)
 	case reflect.Interface:
-		if c, ok := nilCompare(aVal, bVal); ok {
-			return c
-		}
-		c := compare(reflect.ValueOf(aVal.Elem().Type()), reflect.ValueOf(bVal.Elem().Type()))
-		if c != 0 {
-			return c
-		}
-		return compare(aVal.Elem(), bVal.Elem())
+		return interfaceCompare(aVal, bVal)
 	default:
 		// Certain types cannot appear as keys (maps, funcs, slices), but be explicit.
 		panic("bad type in compare: " + aType.String())
 	}
+}
+
+func intCompare(a, b int64) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
+}
+
+func uintCompare(a, b uint64) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
+}
+
+func stringCompare(a, b string) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
+}
+
+func complexCompare(a, b complex128) int {
+	if c := floatCompare(real(a), real(b)); c != 0 {
+		return c
+	}
+	return floatCompare(imag(a), imag(b))
+}
+
+func boolCompare(a, b bool) int {
+	switch {
+	case a == b:
+		return 0
+	case a:
+		return 1
+	default:
+		return -1
+	}
+}
+
+func pointerCompare(a uintptr, b uintptr) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
+}
+
+func structCompare(aVal, bVal reflect.Value) int {
+	for i := 0; i < aVal.NumField(); i++ {
+		if c := compare(aVal.Field(i), bVal.Field(i)); c != 0 {
+			return c
+		}
+	}
+	return 0
+}
+
+func arrayCompare(aVal, bVal reflect.Value) int {
+	for i := 0; i < aVal.Len(); i++ {
+		if c := compare(aVal.Index(i), bVal.Index(i)); c != 0 {
+			return c
+		}
+	}
+	return 0
+}
+
+func interfaceCompare(aVal, bVal reflect.Value) int {
+	if c, ok := nilCompare(aVal, bVal); ok {
+		return c
+	}
+	c := compare(reflect.ValueOf(aVal.Elem().Type()), reflect.ValueOf(bVal.Elem().Type()))
+	if c != 0 {
+		return c
+	}
+	return compare(aVal.Elem(), bVal.Elem())
 }
 
 // nilCompare checks whether either value is nil. If not, the boolean is false.
