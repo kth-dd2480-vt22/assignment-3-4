@@ -86,7 +86,7 @@ func (t *buildTransformation) Transform(ctx *resources.ResourceTransformationCtx
 	opts.contents = string(src)
 	opts.mediaType = ctx.InMediaType
 
-	buildOptions, err := toBuildOptions(opts)
+	buildOptions, err, _ := toBuildOptions(opts)
 	if err != nil {
 		return err
 	}

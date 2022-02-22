@@ -14,6 +14,7 @@
 package js
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -44,9 +45,23 @@ func TestOptionKey(t *testing.T) {
 }
 
 func TestToBuildOptions(t *testing.T) {
+	fmt.Println("TestToBuildOptions")
 	c := qt.New(t)
 
-	opts, err := toBuildOptions(Options{mediaType: media.JavascriptType})
+	var cover [100]int
+	var temp [100]int
+
+	// Test 1
+	fmt.Println("Test 1")
+	/* 
+	 * This one tests when mediaType is set to media.JavascriptType,
+	 * and the rest of the options are set to default values 
+	 * -> branch 0, 10, 11, 16, 21 and 24
+	 */
+	opts, err, temp := toBuildOptions(Options{mediaType: media.JavascriptType})
+	for i := 0; i < 100; i++ {
+		cover[i] += temp[i]
+	}
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(opts, qt.DeepEquals, api.BuildOptions{
@@ -58,7 +73,21 @@ func TestToBuildOptions(t *testing.T) {
 		},
 	})
 
-	opts, err = toBuildOptions(Options{
+	for i := 0; i < 26; i++ {
+		if temp[i] > 0 {
+			fmt.Printf("branch %d is covered %d times\n", i, temp[i])
+		}
+	}
+
+	// Test 2
+	fmt.Println("Test 2")
+	/*
+	 * This one tests when Target is set to "es2018", Format is set to "cjs",
+	 * Minify is set to true, mediaType is set to media.JavascriptType,
+	 * , AvoidTDZ is set to true, and the rest set to default values
+	 * -> branch 5, 10, 11, 18, 21 and 24
+	 */
+	opts, err, temp = toBuildOptions(Options{
 		Target:    "es2018",
 		Format:    "cjs",
 		Minify:    true,
@@ -77,8 +106,24 @@ func TestToBuildOptions(t *testing.T) {
 			Loader: api.LoaderJS,
 		},
 	})
+	for i := 0; i < 100; i++ {
+		cover[i] += temp[i]
+	}
+	for i := 0; i < 26; i++ {
+		if temp[i] > 0 {
+			fmt.Printf("branch %d is covered %d times\n", i, temp[i])
+		}
+	}
 
-	opts, err = toBuildOptions(Options{
+	// Test 3
+	fmt.Println("Test 3")
+	/*
+	 * This one tests when Target is set to "es2018", Format is set to "cjs",
+	 * Minify is set to true, mediaType is set to media.JavascriptType,
+	 * , SourceMap set to "inline", and the rest set to default values
+	 * -> branch 5, 10, 11, 18, 21 and 22
+	 */
+	opts, err, temp = toBuildOptions(Options{
 		Target: "es2018", Format: "cjs", Minify: true, mediaType: media.JavascriptType,
 		SourceMap: "inline",
 	})
@@ -95,8 +140,24 @@ func TestToBuildOptions(t *testing.T) {
 			Loader: api.LoaderJS,
 		},
 	})
+	for i := 0; i < 100; i++ {
+		cover[i] += temp[i]
+	}
+	for i := 0; i < 26; i++ {
+		if temp[i] > 0 {
+			fmt.Printf("branch %d is covered %d times\n", i, temp[i])
+		}
+	}
 
-	opts, err = toBuildOptions(Options{
+	// Test 4
+	fmt.Println("Test 4")
+	/*
+	 * This one tests when Target is set to "es2018", Format is set to "cjs",
+	 * Minify is set to true, mediaType is set to media.JavascriptType,
+	 * , SourceMap set to "inline", and the rest set to default values
+	 * -> branch 5, 10, 11, 18, 21 and 22
+	 */
+	opts, err, temp = toBuildOptions(Options{
 		Target: "es2018", Format: "cjs", Minify: true, mediaType: media.JavascriptType,
 		SourceMap: "inline",
 	})
@@ -113,8 +174,24 @@ func TestToBuildOptions(t *testing.T) {
 			Loader: api.LoaderJS,
 		},
 	})
+	for i := 0; i < 100; i++ {
+		cover[i] += temp[i]
+	}
+	for i := 0; i < 26; i++ {
+		if temp[i] > 0 {
+			fmt.Printf("branch %d is covered %d times\n", i, temp[i])
+		}
+	}
 
-	opts, err = toBuildOptions(Options{
+	// Test 5
+	fmt.Println("Test 5")
+	/*
+	 * This one tests when Target is set to "es2018", Format is set to "cjs",
+	 * Minify is set to true, mediaType is set to media.JavascriptType,
+	 * , SourceMap set to "external", and the rest set to default values
+	 * -> branch 5, 10, 11, 18, 21 and 23
+	 */
+	opts, err, temp = toBuildOptions(Options{
 		Target: "es2018", Format: "cjs", Minify: true, mediaType: media.JavascriptType,
 		SourceMap: "external",
 	})
@@ -131,6 +208,27 @@ func TestToBuildOptions(t *testing.T) {
 			Loader: api.LoaderJS,
 		},
 	})
+	for i := 0; i < 100; i++ {
+		cover[i] += temp[i]
+	}
+	for i := 0; i < 26; i++ {
+		if temp[i] > 0 {
+			fmt.Printf("branch %d is covered %d times\n", i, temp[i])
+		}
+	}
+	
+	// Print the coverage for the 26 branches.
+	fmt.Println("Branch Coverage for TestToBuildOptions:")
+	var covered int
+	for i := 0; i < 26; i++ {
+		if cover[i] > 0 {
+			covered++
+			fmt.Printf("branch %d is covered %d times\n", i, cover[i])
+		}
+	}
+	// Print the percentage of branches covered.
+	fmt.Printf("%d branches, which is %.2f%% of the branches are covered\n", covered, float64(covered)/float64(26)*100)
+
 }
 
 func TestResolveComponentInAssets(t *testing.T) {
