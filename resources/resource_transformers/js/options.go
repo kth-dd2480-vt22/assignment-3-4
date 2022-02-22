@@ -300,33 +300,56 @@ func createBuildPlugins(c *Client, opts Options) ([]api.Plugin, error) {
 	return []api.Plugin{importResolver, paramsPlugin}, nil
 }
 
-func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
+func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error, cover [100]int) {
 	var target api.Target
 	switch opts.Target {
 	case "", "esnext":
+		// branch 0
+		cover[0]++		
 		target = api.ESNext
 	case "es5":
+		// branch 1
+		cover[1]++
 		target = api.ES5
 	case "es6", "es2015":
+		// branch 2
+		cover[2]++
 		target = api.ES2015
 	case "es2016":
+		// branch 3
+		cover[3]++
 		target = api.ES2016
 	case "es2017":
+		// branch 4
+		cover[4]++
 		target = api.ES2017
 	case "es2018":
+		// branch 5
+		cover[5]++
 		target = api.ES2018
 	case "es2019":
+		// branch 6
+		cover[6]++
 		target = api.ES2019
 	case "es2020":
+		// branch 7
+		cover[7]++
 		target = api.ES2020
 	default:
+		// branch 8
+		cover[8]++
 		err = fmt.Errorf("invalid target: %q", opts.Target)
 		return
 	}
 
 	mediaType := opts.mediaType
 	if mediaType.IsZero() {
+		// branch 9
+		cover[9]++
 		mediaType = media.JavascriptType
+	} else {
+		// branch 10
+		cover[10]++
 	}
 
 	var loader api.Loader
@@ -334,14 +357,24 @@ func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 	// TODO(bep) ESBuild support a set of other loaders, but I currently fail
 	// to see the relevance. That may change as we start using this.
 	case media.JavascriptType.SubType:
+		// branch 11
+		cover[11]++
 		loader = api.LoaderJS
 	case media.TypeScriptType.SubType:
+		// branch 12
+		cover[12]++
 		loader = api.LoaderTS
 	case media.TSXType.SubType:
+		// branch 13
+		cover[13]++
 		loader = api.LoaderTSX
 	case media.JSXType.SubType:
+		// branch 14
+		cover[14]++
 		loader = api.LoaderJSX
 	default:
+		// branch 15
+		cover[15]++
 		err = fmt.Errorf("unsupported Media Type: %q", opts.mediaType)
 		return
 	}
@@ -350,19 +383,32 @@ func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 	// One of: iife, cjs, esm
 	switch opts.Format {
 	case "", "iife":
+		// branch 16
+		cover[16]++
 		format = api.FormatIIFE
 	case "esm":
+		// branch 17
+		cover[17]++
 		format = api.FormatESModule
 	case "cjs":
+		// branch 18
+		cover[18]++
 		format = api.FormatCommonJS
 	default:
+		// branch 19
+		cover[19]++
 		err = fmt.Errorf("unsupported script output format: %q", opts.Format)
 		return
 	}
 
 	var defines map[string]string
 	if opts.Defines != nil {
+		// branch 20
+		cover[20]++
 		defines = maps.ToStringMapString(opts.Defines)
+	} else {
+		// branch 21
+		cover[21]++
 	}
 
 	// By default we only need to specify outDir and no outFile
@@ -371,12 +417,20 @@ func toBuildOptions(opts Options) (buildOptions api.BuildOptions, err error) {
 	var sourceMap api.SourceMap
 	switch opts.SourceMap {
 	case "inline":
+		// branch 22
+		cover[22]++
 		sourceMap = api.SourceMapInline
 	case "external":
+		// branch 23
+		cover[23]++
 		sourceMap = api.SourceMapExternal
 	case "":
+		// branch 24
+		cover[24]++
 		sourceMap = api.SourceMapNone
 	default:
+		// branch 25
+		cover[25]++
 		err = fmt.Errorf("unsupported sourcemap type: %q", opts.SourceMap)
 		return
 	}
