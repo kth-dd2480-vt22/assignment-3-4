@@ -14,6 +14,7 @@
 package compare
 
 import (
+	"bytes"
 	"path"
 	"reflect"
 	"runtime"
@@ -90,6 +91,10 @@ func TestDefaultFunc(t *testing.T) {
 	now := time.Now()
 	ns := New(false)
 
+	channel := make(chan string)
+	var body *bytes.Buffer
+	body = nil
+
 	for i, test := range []struct {
 		dflt   interface{}
 		given  interface{}
@@ -128,6 +133,25 @@ func TestDefaultFunc(t *testing.T) {
 
 		{struct{ f string }{f: "one"}, struct{}{}, struct{}{}},
 		{struct{ f string }{f: "two"}, nil, struct{ f string }{f: "two"}},
+
+		//Test 1 174 -> 181 (77,6%)
+		{uint(1), uint(0), uint(1)},
+		{uint8(1), uint8(10), uint8(10)},
+		{uint16(1), uint16(10), uint16(10)},
+		{uint32(1), uint32(10), uint32(10)},
+		{uint64(1), uint64(10), uint64(10)},
+
+		//Test 2 181 -> 185
+		{int8(1), int8(10), int8(10)},
+		{int16(1), int16(10), int16(10)},
+		{int32(1), int32(10), int32(10)},
+		{int64(1), int64(10), int64(10)},
+
+		//Test 3 185 -> 187
+		{channel, channel, channel},
+
+		//Test 4 187 -> 188
+		{1, body, 1},
 
 		{then, now, now},
 		{then, time.Time{}, then},
