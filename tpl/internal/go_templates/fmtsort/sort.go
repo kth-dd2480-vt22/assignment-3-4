@@ -89,7 +89,17 @@ func NewBranchCoverages(nBranch int) BranchCoverages {
 	return m
 }
 
-var CompareBC = NewBranchCoverages(32)
+func (bc BranchCoverages) bool(i int, b bool) bool {
+	if b {
+		bc[i].True = true
+		return b
+	}
+
+	bc[i].False = true
+	return b
+}
+
+var CompareBC = NewBranchCoverages(43)
 
 // compare compares two values of the same type. It returns -1, 0, 1
 // according to whether a > b (1), a == b (0), or a < b (-1).
@@ -117,9 +127,8 @@ func compare(aVal, bVal reflect.Value) int {
 	CompareBC[9].Reached = true  //	case reflect.Struct:
 	CompareBC[10].Reached = true //	case reflect.Array:
 	CompareBC[11].Reached = true //	case reflect.Interface:
-	switch aVal.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		CompareBC[1].True = true   //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	switch ___ := aVal.Kind(); {
+	case CompareBC.bool(1, ___ == reflect.Int), CompareBC.bool(32, ___ == reflect.Int8), CompareBC.bool(33, ___ == reflect.Int16), CompareBC.bool(34, ___ == reflect.Int32), CompareBC.bool(35, ___ == reflect.Int64):
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
 		CompareBC[4].False = true  //	case reflect.Float32, reflect.Float64:
@@ -152,9 +161,8 @@ func compare(aVal, bVal reflect.Value) int {
 
 			return 0
 		}
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case CompareBC.bool(2, ___ == reflect.Uint), CompareBC.bool(36, ___ == reflect.Uint8), CompareBC.bool(37, ___ == reflect.Uint16), CompareBC.bool(38, ___ == reflect.Uint32), CompareBC.bool(39, ___ == reflect.Uint64), CompareBC.bool(40, ___ == reflect.Uintptr):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		CompareBC[2].True = true   //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
 		CompareBC[4].False = true  //	case reflect.Float32, reflect.Float64:
 		CompareBC[5].False = true  //	case reflect.Complex64, reflect.Complex128:
@@ -186,10 +194,9 @@ func compare(aVal, bVal reflect.Value) int {
 
 			return 0
 		}
-	case reflect.String:
+	case CompareBC.bool(3, ___ == reflect.String):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		CompareBC[3].True = true   //	case reflect.String:
 		CompareBC[4].False = true  //	case reflect.Float32, reflect.Float64:
 		CompareBC[5].False = true  //	case reflect.Complex64, reflect.Complex128:
 		CompareBC[6].False = true  //	case reflect.Bool:
@@ -220,11 +227,10 @@ func compare(aVal, bVal reflect.Value) int {
 
 			return 0
 		}
-	case reflect.Float32, reflect.Float64:
+	case CompareBC.bool(4, ___ == reflect.Float32), CompareBC.bool(41, ___ == reflect.Float64):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
-		CompareBC[4].True = true   //	case reflect.Float32, reflect.Float64:
 		CompareBC[5].False = true  //	case reflect.Complex64, reflect.Complex128:
 		CompareBC[6].False = true  //	case reflect.Bool:
 		CompareBC[7].False = true  //	case reflect.Ptr, reflect.UnsafePointer:
@@ -234,12 +240,11 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[11].False = true //	case reflect.Interface:
 
 		return floatCompare(aVal.Float(), bVal.Float())
-	case reflect.Complex64, reflect.Complex128:
+	case CompareBC.bool(5, ___ == reflect.Complex64), CompareBC.bool(42, ___ == reflect.Complex128):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
 		CompareBC[4].False = true  //	case reflect.Float32, reflect.Float64:
-		CompareBC[5].True = true   //	case reflect.Complex64, reflect.Complex128:
 		CompareBC[6].False = true  //	case reflect.Bool:
 		CompareBC[7].False = true  //	case reflect.Ptr, reflect.UnsafePointer:
 		CompareBC[8].False = true  //	case reflect.Chan:
@@ -258,13 +263,12 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[18].False = true
 
 		return floatCompare(imag(a), imag(b))
-	case reflect.Bool:
+	case CompareBC.bool(6, ___ == reflect.Bool):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
 		CompareBC[4].False = true  //	case reflect.Float32, reflect.Float64:
 		CompareBC[5].False = true  //	case reflect.Complex64, reflect.Complex128:
-		CompareBC[6].True = true   //	case reflect.Bool:
 		CompareBC[7].False = true  //	case reflect.Ptr, reflect.UnsafePointer:
 		CompareBC[8].False = true  //	case reflect.Chan:
 		CompareBC[9].False = true  //	case reflect.Struct:
@@ -292,14 +296,13 @@ func compare(aVal, bVal reflect.Value) int {
 
 			return -1
 		}
-	case reflect.Ptr, reflect.UnsafePointer:
+	case CompareBC.bool(7, ___ == reflect.Ptr), CompareBC.bool(18, ___ == reflect.UnsafePointer):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
 		CompareBC[4].False = true  //	case reflect.Float32, reflect.Float64:
 		CompareBC[5].False = true  //	case reflect.Complex64, reflect.Complex128:
 		CompareBC[6].False = true  //	case reflect.Bool:
-		CompareBC[7].True = true   //	case reflect.Ptr, reflect.UnsafePointer:
 		CompareBC[8].False = true  //	case reflect.Chan:
 		CompareBC[9].False = true  //	case reflect.Struct:
 		CompareBC[10].False = true //	case reflect.Array:
@@ -326,7 +329,7 @@ func compare(aVal, bVal reflect.Value) int {
 
 			return 0
 		}
-	case reflect.Chan:
+	case CompareBC.bool(8, ___ == reflect.Chan):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
@@ -334,7 +337,6 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[5].False = true  //	case reflect.Complex64, reflect.Complex128:
 		CompareBC[6].False = true  //	case reflect.Bool:
 		CompareBC[7].False = true  //	case reflect.Ptr, reflect.UnsafePointer:
-		CompareBC[8].True = true   //	case reflect.Chan:
 		CompareBC[9].False = true  //	case reflect.Struct:
 		CompareBC[10].False = true //	case reflect.Array:
 		CompareBC[11].False = true //	case reflect.Interface:
@@ -367,7 +369,7 @@ func compare(aVal, bVal reflect.Value) int {
 
 			return 0
 		}
-	case reflect.Struct:
+	case CompareBC.bool(9, ___ == reflect.Struct):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
@@ -376,7 +378,6 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[6].False = true  //	case reflect.Bool:
 		CompareBC[7].False = true  //	case reflect.Ptr, reflect.UnsafePointer:
 		CompareBC[8].False = true  //	case reflect.Chan:
-		CompareBC[9].True = true   //	case reflect.Struct:
 		CompareBC[10].False = true //	case reflect.Array:
 		CompareBC[11].False = true //	case reflect.Interface:
 
@@ -396,7 +397,7 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[26].False = true
 
 		return 0
-	case reflect.Array:
+	case CompareBC.bool(10, ___ == reflect.Array):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
@@ -406,7 +407,6 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[7].False = true  //	case reflect.Ptr, reflect.UnsafePointer:
 		CompareBC[8].False = true  //	case reflect.Chan:
 		CompareBC[9].False = true  //	case reflect.Struct:
-		CompareBC[10].True = true  //	case reflect.Array:
 		CompareBC[11].False = true //	case reflect.Interface:
 
 		CompareBC[28].Reached = true
@@ -425,7 +425,7 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[29].False = true
 
 		return 0
-	case reflect.Interface:
+	case CompareBC.bool(11, ___ == reflect.Interface):
 		CompareBC[1].False = true  //	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		CompareBC[2].False = true  //	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		CompareBC[3].False = true  //	case reflect.String:
@@ -436,7 +436,6 @@ func compare(aVal, bVal reflect.Value) int {
 		CompareBC[8].False = true  //	case reflect.Chan:
 		CompareBC[9].False = true  //	case reflect.Struct:
 		CompareBC[10].False = true //	case reflect.Array:
-		CompareBC[11].True = true  //	case reflect.Interface:
 
 		CompareBC[30].Reached = true
 		if c, ok := nilCompare(aVal, bVal); ok {
