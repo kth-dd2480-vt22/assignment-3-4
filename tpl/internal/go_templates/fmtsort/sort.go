@@ -72,107 +72,139 @@ func Sort(mapValue reflect.Value) *SortedMap {
 	return sorted
 }
 
+type BranchCoverage struct {
+	Reached bool
+	True    bool
+	False   bool
+}
+
+type BranchCoverages []BranchCoverage
+
+func NewBranchCoverages(nBranch int) BranchCoverages {
+	m := make([]BranchCoverage, nBranch)
+	for i := 0; i < nBranch; i++ {
+		m[i] = BranchCoverage{}
+	}
+
+	return m
+}
+
+func (bc BranchCoverages) bool(i int, b bool) bool {
+	bc[i].Reached = true
+
+	if b {
+		bc[i].True = true
+		return b
+	}
+
+	bc[i].False = true
+	return b
+}
+
+var CompareBC = NewBranchCoverages(43)
+var CompareBCCount = 0
+
 // compare compares two values of the same type. It returns -1, 0, 1
 // according to whether a > b (1), a == b (0), or a < b (-1).
 // If the types differ, it returns -1.
 // See the comment on Sort for the comparison rules.
 func compare(aVal, bVal reflect.Value) int {
 	aType, bType := aVal.Type(), bVal.Type()
-	if aType != bType {
+	if CompareBC.bool(0, aType != bType) {
 		return -1 // No good answer possible, but don't return 0: they're not equal.
 	}
-	switch aVal.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	switch __ := aVal.Kind(); {
+	case CompareBC.bool(1, __ == reflect.Int), CompareBC.bool(2, __ == reflect.Int8), CompareBC.bool(3, __ == reflect.Int16), CompareBC.bool(4, __ == reflect.Int32), CompareBC.bool(5, __ == reflect.Int64):
 		a, b := aVal.Int(), bVal.Int()
 		switch {
-		case a < b:
+		case CompareBC.bool(24, a < b):
 			return -1
-		case a > b:
+		case CompareBC.bool(25, a > b):
 			return 1
 		default:
 			return 0
 		}
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case CompareBC.bool(6, __ == reflect.Uint), CompareBC.bool(7, __ == reflect.Uint8), CompareBC.bool(8, __ == reflect.Uint16), CompareBC.bool(9, __ == reflect.Uint32), CompareBC.bool(10, __ == reflect.Uint64), CompareBC.bool(11, __ == reflect.Uintptr):
 		a, b := aVal.Uint(), bVal.Uint()
 		switch {
-		case a < b:
+		case CompareBC.bool(26, a < b):
 			return -1
-		case a > b:
+		case CompareBC.bool(27, a > b):
 			return 1
 		default:
 			return 0
 		}
-	case reflect.String:
+	case CompareBC.bool(12, __ == reflect.String):
 		a, b := aVal.String(), bVal.String()
 		switch {
-		case a < b:
+		case CompareBC.bool(28, a < b):
 			return -1
-		case a > b:
+		case CompareBC.bool(29, a > b):
 			return 1
 		default:
 			return 0
 		}
-	case reflect.Float32, reflect.Float64:
+	case CompareBC.bool(13, __ == reflect.Float32), CompareBC.bool(14, __ == reflect.Float64):
 		return floatCompare(aVal.Float(), bVal.Float())
-	case reflect.Complex64, reflect.Complex128:
+	case CompareBC.bool(15, __ == reflect.Complex64), CompareBC.bool(16, __ == reflect.Complex128):
 		a, b := aVal.Complex(), bVal.Complex()
-		if c := floatCompare(real(a), real(b)); c != 0 {
+		if c := floatCompare(real(a), real(b)); CompareBC.bool(30, c != 0) {
 			return c
 		}
 		return floatCompare(imag(a), imag(b))
-	case reflect.Bool:
+	case CompareBC.bool(17, __ == reflect.Bool):
 		a, b := aVal.Bool(), bVal.Bool()
 		switch {
-		case a == b:
+		case CompareBC.bool(31, a == b):
 			return 0
 		case a:
 			return 1
 		default:
 			return -1
 		}
-	case reflect.Ptr, reflect.UnsafePointer:
+	case CompareBC.bool(18, __ == reflect.Ptr), CompareBC.bool(19, __ == reflect.UnsafePointer):
 		a, b := aVal.Pointer(), bVal.Pointer()
 		switch {
-		case a < b:
+		case CompareBC.bool(32, a < b):
 			return -1
-		case a > b:
+		case CompareBC.bool(33, a > b):
 			return 1
 		default:
 			return 0
 		}
-	case reflect.Chan:
-		if c, ok := nilCompare(aVal, bVal); ok {
+	case CompareBC.bool(20, __ == reflect.Chan):
+		if c, ok := nilCompare(aVal, bVal); CompareBC.bool(34, ok) {
 			return c
 		}
 		ap, bp := aVal.Pointer(), bVal.Pointer()
 		switch {
-		case ap < bp:
+		case CompareBC.bool(35, ap < bp):
 			return -1
-		case ap > bp:
+		case CompareBC.bool(36, ap > bp):
 			return 1
 		default:
 			return 0
 		}
-	case reflect.Struct:
-		for i := 0; i < aVal.NumField(); i++ {
-			if c := compare(aVal.Field(i), bVal.Field(i)); c != 0 {
+	case CompareBC.bool(21, __ == reflect.Struct):
+		for i := 0; CompareBC.bool(37, i < aVal.NumField()); i++ {
+			if c := compare(aVal.Field(i), bVal.Field(i)); CompareBC.bool(38, c != 0) {
 				return c
 			}
 		}
 		return 0
-	case reflect.Array:
-		for i := 0; i < aVal.Len(); i++ {
-			if c := compare(aVal.Index(i), bVal.Index(i)); c != 0 {
+	case CompareBC.bool(22, __ == reflect.Array):
+		for i := 0; CompareBC.bool(39, i < aVal.Len()); i++ {
+			if c := compare(aVal.Index(i), bVal.Index(i)); CompareBC.bool(40, c != 0) {
 				return c
 			}
 		}
 		return 0
-	case reflect.Interface:
-		if c, ok := nilCompare(aVal, bVal); ok {
+	case CompareBC.bool(23, __ == reflect.Interface):
+		if c, ok := nilCompare(aVal, bVal); CompareBC.bool(41, ok) {
 			return c
 		}
 		c := compare(reflect.ValueOf(aVal.Elem().Type()), reflect.ValueOf(bVal.Elem().Type()))
-		if c != 0 {
+		if CompareBC.bool(42, c != 0) {
 			return c
 		}
 		return compare(aVal.Elem(), bVal.Elem())
