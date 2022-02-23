@@ -44,6 +44,24 @@ func TestCompareFuncs(t *testing.T) {
 	compare(a, b)
 }
 
+func TestCompareMaps(t *testing.T) {
+	defer func() {
+		if r := recover(); r != nil {
+			return
+		}
+
+		t.Fail()
+	}()
+
+	var at = map[string]interface{}{}
+	a := reflect.ValueOf(at)
+
+	var bt = map[string]interface{}{}
+	b := reflect.ValueOf(bt)
+
+	compare(a, b)
+}
+
 /*
 type nilInf struct {
 	reflect.Value
