@@ -35,7 +35,7 @@ See https://gohugo.io/hugo-modules/ for more information.
   -c, --contentDir string      filesystem path to content directory
   -d, --destination string     filesystem path to write files to
       --disableKinds strings   disable different kind of pages (home, RSS etc.)
-      --enableGitInfo          add Git revision, date and author info to the pages
+      --enableGitInfo          add Git revision, date, author, and CODEOWNERS info to the pages
       --forceSyncStatic        copy all files when static is changed.
       --gc                     enable to run some cleanup tasks (remove unused cache files) after the build
   -h, --help                   help for mod
@@ -49,6 +49,7 @@ See https://gohugo.io/hugo-modules/ for more information.
       --printI18nWarnings      print missing translations
       --printMemoryUsage       print memory usage to screen at intervals
       --printPathWarnings      print warnings on duplicate target paths etc.
+      --printUnusedTemplates   print warnings on unused templates.
       --templateMetrics        display metrics about template executions
       --templateMetricsHints   calculate some improvement hints when combined with --templateMetrics
   -t, --theme strings          themes to use (located in /themes/THEMENAME/)

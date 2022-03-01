@@ -43,7 +43,7 @@ hugo server [flags]
       --disableFastRender      enables full re-renders on changes
       --disableKinds strings   disable different kind of pages (home, RSS etc.)
       --disableLiveReload      watch without enabling live browser reload on rebuild
-      --enableGitInfo          add Git revision, date and author info to the pages
+      --enableGitInfo          add Git revision, date, author, and CODEOWNERS info to the pages
       --forceSyncStatic        copy all files when static is changed.
       --gc                     enable to run some cleanup tasks (remove unused cache files) after the build
   -h, --help                   help for server
@@ -63,6 +63,7 @@ hugo server [flags]
       --printI18nWarnings      print missing translations
       --printMemoryUsage       print memory usage to screen at intervals
       --printPathWarnings      print warnings on duplicate target paths etc.
+      --printUnusedTemplates   print warnings on unused templates.
       --renderToDisk           render to Destination path (default is render to memory & serve from there)
       --templateMetrics        display metrics about template executions
       --templateMetricsHints   calculate some improvement hints when combined with --templateMetrics
