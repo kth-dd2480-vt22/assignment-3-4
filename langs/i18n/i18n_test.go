@@ -110,6 +110,51 @@ var i18nTests = []i18nTest{
 		expected:     "",
 		expectedFlag: "[i18n] hello",
 	},
+	//
+	// ----- Trigger bug #9216 -----
+	// Translation is not available in current language but available in default language,
+	// however default language is not english.
+	{
+		name: "present-in-default-no-english",
+		data: map[string][]byte{
+			"de.toml": []byte("[hello]\nother = \"Hallo, Welt!\""),
+			"es.toml": []byte("[goodbye]\nother = \"¡Adiós, Mundo!\""),
+		},
+		args:         nil,
+		lang:         "es",
+		id:           "hello",
+		expected:     "Hallo, Welt!",
+		expectedFlag: "[i18n] hello",
+	},
+	// Another one
+	{
+		name: "present-in-default-no-english-2",
+		data: map[string][]byte{
+			"fr.toml": []byte("[hello]\nother = \"Bonjour, Monde!\""),
+			"de.toml": []byte("[hello]\nother = \"Hallo, Welt!\""),
+			"es.toml": []byte("[goodbye]\nother = \"¡Adiós, Mundo!\""),
+		},
+		args:         nil,
+		lang:         "es",
+		id:           "hello",
+		expected:     "Bonjour, Monde!",
+		expectedFlag: "[i18n] hello",
+	},
+	// A third one
+	{
+		name: "present-in-default-no-english-3",
+		data: map[string][]byte{
+			"fr.toml": []byte("[hello]\nother = \"Bonjour, Monde!\""),
+			"de.toml": []byte("[goodbye]\nother = \"Auf Wiedersehen, Welt!\""),
+			"es.toml": []byte("[goodbye]\nother = \"¡Adiós, Mundo!\""),
+		},
+		args:         nil,
+		lang:         "de",
+		id:           "hello",
+		expected:     "Bonjour, Monde!",
+		expectedFlag: "[i18n] hello",
+	},
+	// ----------------------------
 	// Context provided
 	{
 		name: "context-provided",
