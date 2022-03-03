@@ -43,6 +43,7 @@ type i18nTest struct {
 	data                             map[string][]byte
 	args                             interface{}
 	lang, id, expected, expectedFlag string
+	defaultLang						 string
 }
 
 var i18nTests = []i18nTest{
@@ -121,6 +122,7 @@ var i18nTests = []i18nTest{
 			"es.toml": []byte("[goodbye]\nother = \"¡Adiós, Mundo!\""),
 		},
 		args:         nil,
+		defaultLang:  "de",
 		lang:         "es",
 		id:           "hello",
 		expected:     "Hallo, Welt!",
@@ -135,6 +137,7 @@ var i18nTests = []i18nTest{
 			"es.toml": []byte("[goodbye]\nother = \"¡Adiós, Mundo!\""),
 		},
 		args:         nil,
+		defaultLang:  "fr",
 		lang:         "es",
 		id:           "hello",
 		expected:     "Bonjour, Monde!",
@@ -149,6 +152,7 @@ var i18nTests = []i18nTest{
 			"es.toml": []byte("[goodbye]\nother = \"¡Adiós, Mundo!\""),
 		},
 		args:         nil,
+		defaultLang:  "fr",
 		lang:         "de",
 		id:           "hello",
 		expected:     "Bonjour, Monde!",
@@ -580,6 +584,9 @@ func TestI18nTranslate(t *testing.T) {
 					expected = test.expectedFlag
 				} else {
 					expected = test.expected
+				}
+				if test.defaultLang != "" {
+					v.Set("defaultContentLanguage", test.defaultLang)
 				}
 				actual = doTestI18nTranslate(c, test, v)
 				c.Assert(actual, qt.Equals, expected)
