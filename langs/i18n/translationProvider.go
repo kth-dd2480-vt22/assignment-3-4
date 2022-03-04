@@ -61,7 +61,6 @@ func (tp *TranslationProvider) Update(d *deps.Deps) error {
 		defaultLangTag = language.English
 	}
 	bundle := i18n.NewBundle(defaultLangTag)
-
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 	bundle.RegisterUnmarshalFunc("yml", yaml.Unmarshal)
