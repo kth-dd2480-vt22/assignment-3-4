@@ -53,7 +53,14 @@ func (tp *TranslationProvider) Update(d *deps.Deps) error {
 	if defaultLang == "" {
 		defaultLang = "en"
 	}
-	bundle := i18n.NewBundle(language.MustParse(defaultLang))
+	var defaultLangTag language.Tag
+	defaultLangTag, err := language.Parse(defaultLang)
+	// If the default language set can not be parsed to a valid language tag,
+	// we will fall back to en.
+	if err != nil {
+		defaultLangTag = language.English
+	}
+	bundle := i18n.NewBundle(defaultLangTag)
 
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
