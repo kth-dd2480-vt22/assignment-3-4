@@ -579,6 +579,7 @@ func TestI18nTranslate(t *testing.T) {
 		v.Set("enableMissingTranslationPlaceholders", enablePlaceholders)
 
 		for _, test := range i18nTests {
+			v.Set("defaultContentLanguage", "en")
 			c.Run(fmt.Sprintf("%s-%t", test.name, enablePlaceholders), func(c *qt.C) {
 				if enablePlaceholders {
 					expected = test.expectedFlag
