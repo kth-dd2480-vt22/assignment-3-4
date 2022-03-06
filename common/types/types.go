@@ -27,16 +27,16 @@ type RLocker interface {
 	RUnlock()
 }
 
-// KeyValue is a interface{} tuple.
-type KeyValue struct {
-	Key   interface{}
-	Value interface{}
+// KeyValue is a K, V tuple.
+type KeyValue[K, V any] struct {
+	Key   K
+	Value V
 }
 
-// KeyValueStr is a string tuple.
-type KeyValueStr struct {
-	Key   string
-	Value string
+// NewKeyValue takes a given key and value and returns a new
+// KeyValue struct.
+func NewKeyValue[K, V any](key K, values V) KeyValue[K, V] {
+	return KeyValue[K, V]{Key: key, Value: values}
 }
 
 // KeyValues holds an key and a slice of values.
