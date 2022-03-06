@@ -51,7 +51,7 @@ func TestRelated(t *testing.T) {
 		},
 	}
 
-	result, err := pages.RelatedTo(types.NewKeyValuesStrings("keywords", "hugo", "rocks"))
+	result, err := pages.RelatedTo(types.NewKeyValues("keywords", "hugo", "rocks"))
 
 	c.Assert(err, qt.IsNil)
 	c.Assert(len(result), qt.Equals, 2)
@@ -70,7 +70,7 @@ func TestRelated(t *testing.T) {
 	c.Assert(result[0].Title(), qt.Equals, "Page 2")
 	c.Assert(result[1].Title(), qt.Equals, "Page 3")
 
-	result, err = pages.RelatedTo(types.NewKeyValuesStrings("keywords", "bep", "rocks"))
+	result, err = pages.RelatedTo(types.NewKeyValues("keywords", "bep", "rocks"))
 	c.Assert(err, qt.IsNil)
 	c.Assert(len(result), qt.Equals, 2)
 	c.Assert(result[0].Title(), qt.Equals, "Page 2")

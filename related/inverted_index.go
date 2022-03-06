@@ -302,7 +302,7 @@ func (cfg IndexConfig) ToKeywords(v interface{}) ([]Keyword, error) {
 // The resulting document set will be sorted according to number of matches
 // and the index weights, and any matches with a rank below the configured
 // threshold (normalize to 0..100) will be removed.
-func (idx *InvertedIndex) SearchKeyValues(args ...types.KeyValues) ([]Document, error) {
+func (idx *InvertedIndex) SearchKeyValues(args ...types.KeyValues[string, string]) ([]Document, error) {
 	q := make([]queryElement, len(args))
 
 	for i, arg := range args {
