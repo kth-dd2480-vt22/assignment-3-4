@@ -338,7 +338,7 @@ func TestPlural(t *testing.T) {
 		lang     string
 		id       string
 		templ    string
-		variants []types.KeyValue
+		variants []types.KeyValue[any, any]
 	}{
 		{
 			name: "English",
@@ -348,7 +348,7 @@ func TestPlural(t *testing.T) {
 [hour]
 one = "{{ . }} hour"
 other = "{{ . }} hours"`,
-			variants: []types.KeyValue{
+			variants: []types.KeyValue[any, any]{
 				{Key: 1, Value: "1 hour"},
 				{Key: "1", Value: "1 hour"},
 				{Key: 1.5, Value: "1.5 hours"},
@@ -364,7 +364,7 @@ other = "{{ . }} hours"`,
 			templ: `
 [hour]
 other = "{{ with . }}{{ . }}{{ end }} hours"`,
-			variants: []types.KeyValue{
+			variants: []types.KeyValue[any, any]{
 				{Key: 1, Value: "1 hours"},
 				{Key: "1", Value: "1 hours"},
 				{Key: 2, Value: "2 hours"},
@@ -382,7 +382,7 @@ few = "{{ . }} miesiące"
 many = "{{ . }} miesięcy"
 other = "{{ . }} miesiąca"
 `,
-			variants: []types.KeyValue{
+			variants: []types.KeyValue[any, any]{
 				{Key: 1, Value: "1 miesiąc"},
 				{Key: 2, Value: "2 miesiące"},
 				{Key: 100, Value: "100 miesięcy"},

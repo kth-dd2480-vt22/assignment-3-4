@@ -92,7 +92,7 @@ status = 301
 	s, err := DecodeServer(cfg)
 	c.Assert(err, qt.IsNil)
 
-	c.Assert(s.MatchHeaders("/foo.jpg"), qt.DeepEquals, []types.KeyValueStr{
+	c.Assert(s.MatchHeaders("/foo.jpg"), qt.DeepEquals, []types.KeyValue[string, string]{
 		{Key: "X-Content-Type-Options", Value: "nosniff"},
 		{Key: "X-Frame-Options", Value: "DENY"},
 		{Key: "X-XSS-Protection", Value: "1; mode=block"},

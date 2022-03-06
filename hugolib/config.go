@@ -229,7 +229,7 @@ type configLoader struct {
 
 // Handle some legacy values.
 func (l configLoader) applyConfigAliases() error {
-	aliases := []types.KeyValueStr{{Key: "taxonomies", Value: "indexes"}}
+	aliases := []types.KeyValue[string, string]{{Key: "taxonomies", Value: "indexes"}}
 
 	for _, alias := range aliases {
 		if l.cfg.IsSet(alias.Key) {
@@ -303,7 +303,7 @@ func (l configLoader) applyOsEnvOverrides(environ []string) error {
 	// Extract all that start with the HUGO prefix.
 	// The delimiter is the following rune, usually "_".
 	const hugoEnvPrefix = "HUGO"
-	var hugoEnv []types.KeyValueStr
+	var hugoEnv []types.KeyValue[string, string]
 	for _, v := range environ {
 		key, val := config.SplitEnvVar(v)
 		if strings.HasPrefix(key, hugoEnvPrefix) {
@@ -317,10 +317,10 @@ func (l configLoader) applyOsEnvOverrides(environ []string) error {
 			// so variables on the form HUGOxPARAMSxFOO=bar is one option.
 			key := strings.ReplaceAll(delimiterAndKey[1:], delimiterAndKey[:1], delim)
 			key = strings.ToLower(key)
-			hugoEnv = append(hugoEnv, types.KeyValueStr{
-				Key:   key,
-				Value: val,
-			})
+			hugoEnv = append(hugoEnv, types.NewKeyValue(
+				key,
+				val,
+			))
 
 		}
 	}

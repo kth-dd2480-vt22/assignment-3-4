@@ -125,20 +125,20 @@ func (s *Server) init() {
 	})
 }
 
-func (s *Server) MatchHeaders(pattern string) []types.KeyValueStr {
+func (s *Server) MatchHeaders(pattern string) []types.KeyValue[string, string] {
 	s.init()
 
 	if s.compiledHeaders == nil {
 		return nil
 	}
 
-	var matches []types.KeyValueStr
+	var matches []types.KeyValue[string, string]
 
 	for i, g := range s.compiledHeaders {
 		if g.Match(pattern) {
 			h := s.Headers[i]
 			for k, v := range h.Values {
-				matches = append(matches, types.KeyValueStr{Key: k, Value: cast.ToString(v)})
+				matches = append(matches, types.NewKeyValue(k, cast.ToString(v)))
 			}
 		}
 	}
