@@ -42,7 +42,7 @@ type PageGenealogist interface {
 
 	// Template example:
 	// {{ $related := .RegularPages.RelatedTo ( keyVals "tags" "hugo", "rocks")  ( keyVals "date" .Date ) }}
-	RelatedTo(args ...types.KeyValues) (Pages, error)
+	RelatedTo(args ...types.KeyValues[string, string]) (Pages, error)
 }
 
 // Related searches all the configured indices with the search keywords from the
@@ -81,7 +81,7 @@ func (p Pages) RelatedIndices(doc related.Document, indices ...interface{}) (Pag
 }
 
 // RelatedTo searches the given indices with the corresponding values.
-func (p Pages) RelatedTo(args ...types.KeyValues) (Pages, error) {
+func (p Pages) RelatedTo(args ...types.KeyValues[string, string]) (Pages, error) {
 	if len(p) == 0 {
 		return nil, nil
 	}
@@ -89,7 +89,7 @@ func (p Pages) RelatedTo(args ...types.KeyValues) (Pages, error) {
 	return p.search(args...)
 }
 
-func (p Pages) search(args ...types.KeyValues) (Pages, error) {
+func (p Pages) search(args ...types.KeyValues[string, string]) (Pages, error) {
 	return p.withInvertedIndex(func(idx *related.InvertedIndex) ([]related.Document, error) {
 		return idx.SearchKeyValues(args...)
 	})

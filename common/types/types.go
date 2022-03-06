@@ -40,28 +40,24 @@ type KeyValueStr struct {
 }
 
 // KeyValues holds an key and a slice of values.
-type KeyValues struct {
-	Key    interface{}
-	Values []interface{}
+type KeyValues[K, V any] struct {
+	Key    K
+	Values []V
 }
 
 // KeyString returns the key as a string, an empty string if conversion fails.
-func (k KeyValues) KeyString() string {
+func (k KeyValues[K, V]) KeyString() string {
 	return cast.ToString(k.Key)
 }
 
-func (k KeyValues) String() string {
+func (k KeyValues[K, V]) String() string {
 	return fmt.Sprintf("%v: %v", k.Key, k.Values)
 }
 
-// NewKeyValuesStrings takes a given key and slice of values and returns a new
+// NewKeyValues takes a given key and slice of values and returns a new
 // KeyValues struct.
-func NewKeyValuesStrings(key string, values ...string) KeyValues {
-	iv := make([]interface{}, len(values))
-	for i := 0; i < len(values); i++ {
-		iv[i] = values[i]
-	}
-	return KeyValues{Key: key, Values: iv}
+func NewKeyValues[K, V any](key K, values ...V) KeyValues[K, V] {
+	return KeyValues[K, V]{Key: key, Values: values}
 }
 
 // Zeroer, as implemented by time.Time, will be used by the truth template

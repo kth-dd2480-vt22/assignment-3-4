@@ -756,8 +756,8 @@ func (ns *Namespace) Uniq(seq interface{}) (interface{}, error) {
 }
 
 // KeyVals creates a key and values wrapper.
-func (ns *Namespace) KeyVals(key interface{}, vals ...interface{}) (types.KeyValues, error) {
-	return types.KeyValues{Key: key, Values: vals}, nil
+func (ns *Namespace) KeyVals(key any, vals ...any) (types.KeyValues[any, any], error) {
+	return types.KeyValues[any, any]{Key: key, Values: vals}, nil
 }
 
 // NewScratch creates a new Scratch which can be used to store values in a

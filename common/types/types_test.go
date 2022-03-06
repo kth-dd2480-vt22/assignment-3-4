@@ -22,8 +22,8 @@ import (
 func TestKeyValues(t *testing.T) {
 	c := qt.New(t)
 
-	kv := NewKeyValuesStrings("key", "a1", "a2")
+	kv := NewKeyValues("key", "a1", "a2")
 
 	c.Assert(kv.KeyString(), qt.Equals, "key")
-	c.Assert(kv.Values, qt.DeepEquals, []interface{}{"a1", "a2"})
+	c.Assert(kv.Values, qt.DeepEquals, []string{"a1", "a2"})
 }
