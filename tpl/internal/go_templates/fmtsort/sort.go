@@ -11,6 +11,8 @@ package fmtsort
 import (
 	"reflect"
 	"sort"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Note: Throughout this package we avoid calling reflect.Value.Interface as
@@ -72,6 +74,17 @@ func Sort(mapValue reflect.Value) *SortedMap {
 	return sorted
 }
 
+func compareOrdered[T constraints.Ordered](a, b T) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
+}
+
 // compare compares two values of the same type. It returns -1, 0, 1
 // according to whether a > b (1), a == b (0), or a < b (-1).
 // If the types differ, it returns -1.
@@ -83,35 +96,11 @@ func compare(aVal, bVal reflect.Value) int {
 	}
 	switch aVal.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		a, b := aVal.Int(), bVal.Int()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return compareOrdered(aVal.Int(), bVal.Int())
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		a, b := aVal.Uint(), bVal.Uint()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return compareOrdered(aVal.Uint(), bVal.Uint())
 	case reflect.String:
-		a, b := aVal.String(), bVal.String()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return compareOrdered(aVal.String(), bVal.String())
 	case reflect.Float32, reflect.Float64:
 		return floatCompare(aVal.Float(), bVal.Float())
 	case reflect.Complex64, reflect.Complex128:
@@ -131,28 +120,12 @@ func compare(aVal, bVal reflect.Value) int {
 			return -1
 		}
 	case reflect.Ptr, reflect.UnsafePointer:
-		a, b := aVal.Pointer(), bVal.Pointer()
-		switch {
-		case a < b:
-			return -1
-		case a > b:
-			return 1
-		default:
-			return 0
-		}
+		return compareOrdered(aVal.Pointer(), bVal.Pointer())
 	case reflect.Chan:
 		if c, ok := nilCompare(aVal, bVal); ok {
 			return c
 		}
-		ap, bp := aVal.Pointer(), bVal.Pointer()
-		switch {
-		case ap < bp:
-			return -1
-		case ap > bp:
-			return 1
-		default:
-			return 0
-		}
+		return compareOrdered(aVal.Pointer(), bVal.Pointer())
 	case reflect.Struct:
 		for i := 0; i < aVal.NumField(); i++ {
 			if c := compare(aVal.Field(i), bVal.Field(i)); c != 0 {
